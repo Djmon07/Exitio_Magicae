@@ -2,7 +2,7 @@ from sys import exit
 from random import randint
 from textwrap import dedent
 
-
+# this creats an object that contains the state on the game
 class Player(object):
     def __init__(self):
         self.hunger = 50
@@ -33,6 +33,7 @@ class Admin(object):
         self.gold = 10000000
         self.canteen = 1000
         self.water = 1000
+# takes the string and uses it to get a class and call its enter method
 class Engine(object):
     def __init__(self, scene_map):
         self.scene_map = scene_map
@@ -45,11 +46,11 @@ class Engine(object):
             current_scene = self.scene_map.next_scene(next_scene_name)
         current_scene.enter()
 
-
+#this is the overarching scene that contains the genaric commands
 class Scene(object):
     def enter(self):
         exit(1)
-
+#lets the player eat
     def eat(self):
         if player.food_cooked > 0:
             if player.hunger > 200:
@@ -58,7 +59,7 @@ class Scene(object):
                 player.hunger += 10
             else:
                 print('you are full')
-
+# displays the current status of the player
     def stats(self):
         print(dedent(f"""
         gold: {player.gold}
@@ -70,13 +71,13 @@ class Scene(object):
         coal:{player.coal}
         """))
         if player.canteen == True:
-            print(f'Canteen: {player.water}')
+            print(f'Canteen: {player.water} / {player.canteen}')
 
-
+# this is a work in progress
 class Battle(Scene):
     pass
 
-
+#start screen
 class Game_start(Scene):
     def enter(self):
         print(dedent("""
@@ -102,7 +103,7 @@ class Game_start(Scene):
 
             """))
         return 'game_start'
-
+# intro to world and maby combat totorial
 class Intro(Scene):
     def enter(self):
         choice = input(dedent("""
@@ -127,6 +128,7 @@ class Intro(Scene):
         else:
             print('wot')
             return 'intro'
+# base of of the game inbetween the major points of intrest
 class Campfire(Scene):
     def enter(self):
         choice = input(dedent(f"""
@@ -172,7 +174,7 @@ class Campfire(Scene):
             print("you don't know how to do that")
             return 'campfire'
 
-
+# you can cook here does nothing for now
 class Cabin(Scene):
     def enter(self):
         choice = input(dedent(f"""
@@ -203,7 +205,7 @@ class Cabin(Scene):
         else:
             print("no that would be stupid")
             return 'cabin'
-
+# hunting and mining area
 class North(Scene):
     def enter(self):
         print(dedent(f"""
@@ -272,13 +274,13 @@ class North(Scene):
             print('not an option')
             return 'north'
 
-
+#work in progress
 class West(Scene):
     def enter(self):
         print("no you can't go here... yet im working on it")
         return 'campfire'
 
-
+# town with branching path to the buildings
 class East(Scene):
     def enter(self):
         choice = input(dedent("""
@@ -308,6 +310,7 @@ class East(Scene):
         else:
             print("thats not a great thing to do")
             return 'east'
+# the well where the player can fill a canteen or drink water
 class Well(Scene):
     def enter(self):
         print('you arive at the well what will you do')
@@ -334,7 +337,7 @@ class Well(Scene):
             print('eather drink fill or just leave')
             return 'well'
 
-
+#place to buy stuff
 class Market(Scene):
     def enter(self):
         choice = input(dedent("""
@@ -383,6 +386,7 @@ class Market(Scene):
             print('no thats not right')
             return 'east'
 
+#this is where tools are bought and minarals are sold
 class Blacksmith(Scene):
     def enter(self):
         choice = input(dedent(f"""
@@ -451,7 +455,7 @@ class Blacksmith(Scene):
 class Finale(Scene):
     pass
 
-
+# this one doesn't come up much yet
 class Death(Scene):
     def enter(self):
         choice = input(dedent("""
@@ -467,8 +471,9 @@ class Death(Scene):
             print('what')
             return 'death'
 
-
+#this creats a map for it
 class Map(object):
+    #this is a list of all the scenes
     scenes = {
         'game_start': Game_start(),
         'intro': Intro(),
@@ -483,17 +488,17 @@ class Map(object):
         'death': Death(),
         'finale': Finale()
     }
-
+    # this creates the object start scenes
     def __init__(self, start_scene):
         self.start_scene = start_scene
-
+    # this creats next_scene for use
     def next_scene(self, scene_name):
         val = Map.scenes.get(scene_name)
         return val
 
     def opening_scene(self):
         return self.next_scene(self.start_scene)
-
+#I know this looks the same as the books but I tryed to make one and it just so happend to come out the same
 
 player = Player()
 a_map = Map('game_start')
