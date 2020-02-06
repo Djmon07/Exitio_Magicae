@@ -495,7 +495,7 @@ class Map(object):
         return self.next_scene(self.start_scene)
 
 
-player = Admin()
+player = Player()
 a_map = Map('game_start')
 a_game = Engine(a_map)
 a_game.play()
