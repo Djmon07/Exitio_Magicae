@@ -6,13 +6,16 @@ from textwrap import dedent
 class Player(object):
     def __init__(self):
         self.hunger = 50
-        self.thirst = 5
+        self.thirst = 50
         self.food_raw = 0
         self.food_cooked = 5
         self.wood = 0
         self.location = 'string'
         self.mine_equip = False
         self.bow = False
+        self.dimonds = 0
+        self.coal = 0
+        self.gold = 10
 
 class Engine(object):
     def __init__(self, scene_map):
@@ -36,7 +39,7 @@ class Scene(object):
             print("you eat food")
             player.food_cooked -= 1
             player.hunger += 10
-
+
     def stats(self):
         print(dedent(f"""
         Hunger:{player.hunger}
@@ -44,11 +47,9 @@ class Scene(object):
         Food:cooked:{food_cooked} raw:{food_raw}
         Wood:{player.wood}
         """))
-    def quit(self):
-        exit(1)
 
-
-
+class Battle(Scene):
+    pass
 class Game_start(Scene):
     def enter(self):
         print(dedent("""
@@ -78,7 +79,6 @@ class Intro(Scene):
             that you are so strong they needent bother
             The mayor then gifts you a cabin in the woods near by as thanks
             you diside to rest for a bit by the magic fire outside"""))
-
             return 'campfire'
 
 
@@ -93,22 +93,21 @@ class Campfire(Scene):
         if choice == 'east' or choice == 'East':
             print('you take the eastern road')
             player.hunger -= 5
+            player.thirst -= 10
             return 'east'
         elif choice == 'north' or choice == 'North':
             print('you take the northern trail')
             player.hunger -= 5
+            player.thirst -= 5
             return 'north'
         elif choice == 'West' or choice == 'west':
             print('you take the western path')
             player.hunger -= 5
+            player.thirst -= 5
             return 'west'
         elif choice == 'cabin' or choice == 'Cabin':
             print('you go to the cabin')
             return 'cabin'
-
-        elif choice == 'stats' or choice == 'check':
-            self.stats()
-            return 'campfire'
         elif choice == 'cook' or choice == 'Cook':
             if player.food_raw > 0:
                 player.food_raw -= 1
@@ -116,6 +115,14 @@ class Campfire(Scene):
             else:
                 print("you do not have any raw food")
             return 'campfire'
+        elif choice == 'stats' or choice == 'check':
+            self.stats()
+            return 'campfire'
+        elif str.lower(choice) == 'eat':
+            self.eat()
+            return 'campfir'
+        elif choice == 'quit':
+            exit(1)
         else:
             print("you don't know how to do that")
             return 'campfire'
@@ -140,9 +147,18 @@ class Cabin(Scene):
         elif choice == 'exit' or choice == 'leaves':
             print('you leave the cabin')
             return 'campfire'
+        elif choice == 'stats' or choice == 'check':
+            self.stats()
+            return 'cabin'
+        elif str.lower(choice) == 'eat':
+            self.eat()
+            return 'cabin'
+        elif choice == 'quit':
+            exit(1)
         else:
             print("no that would be stupid")
             return 'cabin'
+
 
 class North(Scene):
     def enter(self):
@@ -152,16 +168,74 @@ class North(Scene):
         """))
         if player.mine_equip == True:
             print('There is a pickaxe and a shovel')
-        input("the woods around here look full of dear")
+        choice = input("the woods around here look full of deer")
+        if str.lower(choice) = 'hunt':
+            player.hunger -= 5
+            player.thirst -= 5
+            if player.bow = True:
+                print('You enter the woods with your bow and begin hunting')
+                pnumber = input('pick a number 1 through 4')
+                random = randint(1,4)
+                fnumber = randint(1,3)
+                if pnumber == random:
+                    player.food_raw += fnumber
+                    print(f'you were succesful you gain {fnumber} food')
+                    return 'north'
+                if pnumber != random:
+                    print('you fail to catch anything')
+                    return 'north'
+        elif str.lower(choice) == 'mine' or str.lower(choice):
+            if player.mine_equip == True:
+                print ('You venture into the moutain caves and begin to mine')
+                mnumber = randint(1,20)
+                if mnumber == 20:
+                    player.hunger -= 5
+                    player.thirst -= 5
+                    print('You found a diamond. Congrats!')
+                    player.diamonds += 1
+                    return 'north'
+                elif mnumber > 5:
+                    player.hunger -= 5
+                    player.thirst -= 5
+                    print('You got some coal. Neat!')
+                    player.coal += 1
+                    return 'north'
+                else:
+                    player.hunger -= 10
+                    player.thirst -= 10
+                    print('you found some rocks. be mad')
+                    return 'north'
+        elif str.lower(choice) == 'pick up' or str.lower(choice) == 'pick up pickaxe':
+            if mine_equip == True:
+                print('you pickup the shovel and pickaxe and put them on your back')
+            else:
+                print('you already took them')
+            return 'north'
 
 class West(Scene):
-    pass
+    print("no you can't go here... yet im working on it")
+    return 'campfire'
 
 
 class East(Scene):
     def enter(self):
-        print('this has worked')
-
+        choice = input(dedent("""
+        You enter the town. You see some buildings.
+        a blacksmith
+        a market
+        a well
+        """))
+        if str.lower(choice) == 'blacksmith':
+            print('you go to the blacksmith')
+            return 'blacksmith'
+        elif str.lower(choice) == 'store' or str.lower(choice) == 'market':
+            print ('you go to the market')
+            return 'market'
+        elif str.lower(choice) == 'well' or  str.lower(choice) == 'go to well':
+            fill = input('you go to the well what will you do')
+            if str.lower(fill) == 'drink':
+                print('you drink some water')
+                player.thirst += 1
 
 class Finale(Scene):
     pass
@@ -176,6 +250,9 @@ class Map(object):
         'north': North(),
         'west': West(),
         'east': East(),
+        'blacksmith': Blacksmith(),
+        'market': Market(),
+        'well': Well(),
         'finale': Finale()
     }
 
@@ -191,6 +268,6 @@ class Map(object):
 
 
 player = Player()
-a_map = Map('cabin')
+a_map = Map('campfire')
 a_game = Engine(a_map)
 a_game.play()
